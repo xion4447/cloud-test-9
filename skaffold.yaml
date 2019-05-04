@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/xion4447/cloud-test-9:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/xion4447/cloud-test-9:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: cloud-test-9
+        chartPath: charts/cloud-test-9
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/xion4447/cloud-test-9'
+          image.tag: '{{.DIGEST_HEX}}'
